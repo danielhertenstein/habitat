@@ -423,6 +423,10 @@ impl Manager {
         let fs_cfg = FsCfg::new(cfg.sup_root());
         match read_process_lock(&fs_cfg.proc_lock_file) {
             Ok(pid) => {
+                // TODO (CM): this only ever worked on Linux! It's a no-op
+                // on Windows! See
+                // https://github.com/habitat-sh/habitat/issues/4945
+                #[cfg(target_os = "linux")]
                 process::signal(pid, Signal::TERM).map_err(|_| sup_error!(Error::SignalFailed))?;
                 Ok(())
             }
